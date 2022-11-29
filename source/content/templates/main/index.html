@@ -1,0 +1,330 @@
+{% load static %}
+{% load bootstrap4 %}
+{% load i18n %}
+{% get_current_language as language_code %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="{{ language_code }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="An example of Django project with basic user functionality.">
+    <meta name="author" content="Yehor Smoliakov">
+    <link rel="icon" href="{% static 'eco.png' %}">
+    <title>EcoMail</title>
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+    {% if request.user.is_authenticated %}
+    <style>
+        * {
+          box-sizing: border-box;
+        }
+        #myInput {
+          background-image: url('/css/searchicon.png');
+          background-position: 10px 10px;
+          background-repeat: no-repeat;
+          width: 100%;
+          font-size: 16px;
+          padding: 12px 20px 12px 40px;
+          border: 1px solid #ddd;
+          margin-top:10px;
+          margin-bottom: 12px;
+          border-radius: 5px;
+        }
+        #myTable {
+          border-collapse: collapse;
+          width: 100%;
+          border: 1px solid #ddd;
+          font-size: 18px;
+        }
+        #myTable th, #myTable td {
+          text-align: left;
+          padding: 12px;
+          background-color: white;
+        }
+        #myTable tr {
+          border-bottom: 1px solid #ddd;
+        }        
+        #myTable tr:hover td{
+          padding: 15px;
+          font-size: 18px;
+          opacity: 1!important;
+        }
+        #myTable tr.header, #myTable {
+          background-color: #f1f1f1;
+        }
+        .big-checkbox {width: 23px; height: 23px;}
+        tr.important td {
+            background-color: #17a2b8!important;
+            color: black!important;
+        }
+        tr.lessimportant td {
+            background-color: gray!important;
+            color: black!important;
+            opacity: 0.5!important;
+        }
+        tr.trash td {
+            background-color: black!important;
+            color: gray!important;
+            opacity: 0.2!important;
+        }
+        tr.emergency td {
+            background-color: rgb(142, 7, 7)!important;
+            color: white!important;
+        }
+    </style>
+    <body>
+        <div style="width: 100%;">
+            <div class="text-white" style="width: 17%; height: 100%; float: left;"> 
+                <div class="d-flex flex-column flex-shrink-0 p-3 text-white" style="width: 280px; background-color: darkgreen;">
+                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                      <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+                        <a class="navbar-brand" href="{% url 'index' %}">
+                            <img src="{% static 'logo.svg' %}" height="100px" width="100%">
+                        </a>
+                    </a>
+                    <br>
+                    <div class="d-flex align-items-center text-white">
+                        <a href="#" ><img src="{% static 'usericonfinal.png' %}" alt="" width="32" height="32" style="margin-left: 40px;margin-right: 20px; border:1px solid darkgray;" class="rounded-circle me-2"></a>
+                        <strong> {{request.user.username}}</strong>
+                    </div>
+                    <br>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a class="nav-link text-white align-items-center" href="{% url 'accounts:change_password' %}">{% trans 'Change password' %}</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link text-white align-items-center" href="{% url 'accounts:change_profile' %}">{% trans 'Modify Profile' %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white align-items-center" href="{% url 'change_language' %}">{% trans 'Translate' %}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger align-items-center" href="{% url 'accounts:log_out' %}">{% trans 'Log out' %}</a>
+                        </li>
+                    </ul>
+                    <br>
+                    <div>
+                        <h5>Carbon emission in grams</h5>
+                        <img src="{% static 'gauge.png' %}" alt="" width="220" height="210">
+                    </div>
+                    <button type="button" class="btn btn-outline-info btn-sm" data-toggle="modal" data-target="#exampleModalLong">
+                        Get more info
+                    </button>
+                    <br>
+                </div>
+            </div>
+            <div style="padding-left: 21%; height: 100%; padding-right: 2%; background-color: #F3FFF0;"> 
+                <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for emails.." title="Type in a name">
+                <table id="myTable">
+                    <tr class="header">
+                        <th style="width: 5%;">
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>                          
+                        </th>
+                        <th style="width:15%;">From</th>
+                        <th style="width:45%;">Subject</th>
+                        <th style="width:10%;">Time</th>
+                        <th style="width:5%">New</th>
+                        <th style="width:5%"></th>
+                    </tr>
+                    <tr class="important" >
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>Raj Shirolkar</td>
+                        <td>Photos from our trip :)</td>
+                        <td> 8:25 pm</td>
+                        <td> 1</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="updates">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>Linkedin</td>
+                        <td>LinkedIn News and others share their thoughts on LinkedIn</td>
+                        <td> 2:35 pm</td>
+                        <td> 17</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="lessimportant">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>Amazon</td>
+                        <td>Winterwear Special: New Zipper Sweatshirts & Hoodies 🤩</td>
+                        <td> 1:35 pm</td>
+                        <td> 14</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="lessimportant">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>ASOS</td>
+                        <td>Exclusive Black Friday SALE Sneak Peek!</td>
+                        <td> 1:05 pm</td>
+                        <td> 5</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="updates">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>Chase Bank</td>
+                        <td>Your statement is ready for account ending in (...XXX)</td>
+                        <td> 12:35 pm</td>
+                        <td> 2</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="important">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>UW Canvas</td>
+                        <td>Submission Posted: A4.1 Evaluation Test Plan Dr...</td>
+                        <td> 11:35 pm</td>
+                        <td> 1</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="updates">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>MSTI Program Information</td>
+                        <td>Program Meeting on Tues, Nov 8 at 12:45pm </td>
+                        <td> 10:25 am</td>
+                        <td> 3</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="lessimportant">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>Adidas</td>
+                        <td>FINAL HOURS! 📢 SHOP FOR 100$ & GET 15$ OFF with adidas!</td>
+                        <td> 8:25 am</td>
+                        <td> 6</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="emergency">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>UW Alert</td>
+                        <td>UW Alert Seattle (Shots fired)</td>
+                        <td> 1:00 am</td>
+                        <td> 15</td>
+                        <td><a href="#" ><img src="{% static 'trash.svg' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                    <tr class="trash">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input big-checkbox" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                </label>
+                            </div>  
+                        </td>
+                        <td>Google</td>
+                        <td>Security alert! Did you sign in using a chrome browser on...</td>
+                        <td> Nov17</td>
+                        <td> 34</td>
+                        <td><a href="#" ><img src="{% static 'trash2.png' %}" alt="" width="32" height="32" class="rounded-circle me-2"></a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- Button trigger modal -->
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Top contributors to CO2 emissions in your inbox</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <a href="#" ><img src="{% static 'co2egraph.png' %}" alt="" width="470" height="300" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none"></a>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        <script>
+            function myFunction() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+                }       
+            }
+            }
+        </script>
+        <script src="{% static 'vendor/jquery/jquery-3.4.1.min.js' %}"></script>
+        <script src="{% static 'vendor/popper/popper.min.js' %}"></script>
+        <script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+    </body>
+    {% else %}
+
+        {% trans 'You are a guest.' %}
+        <a class="nav-link" href="{% url 'accounts:log_in' %}">{% trans 'Log in' %}</a>
+
+    {% endif %}
+
+{% endblock %}
